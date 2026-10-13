@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MEERKAT GAMING LIVE LEADERBOARD</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",Arial,sans-serif;background:#0b0b10 radial-gradient(circle at 50% -10%,#3a0612 0,#0b0b10 55%) no-repeat;color:#eee;min-height:100vh}
+  header{position:relative;padding:36px 12px 48px;text-align:center;background:linear-gradient(180deg,#14141d 0,#0b0b10 100%)}
+  .happy{width:120px;height:auto;display:block;margin:0 auto 10px;filter:drop-shadow(0 0 14px #ffd60a88);animation:bob 2.5s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-8px) rotate(3deg)}}
+  h1{margin:0;font-size:clamp(1.8rem,6vw,4rem);letter-spacing:6px;text-transform:uppercase;color:#fff;text-shadow:0 0 10px #fa1e4e,0 0 24px #fa1e4e}
+  h1>span:first-child{color:#ffd60a;text-shadow:0 0 12px #ffd60a,0 0 30px #ffb300}
+  #clock{margin-top:18px;font-size:clamp(1.4rem,4vw,2.6rem);font-weight:600;color:#ff6b8b;letter-spacing:1px;font-family:Consolas,monospace}
+  main{max-width:900px;margin:0 auto 40px;padding:0 12px}
+  .bar{display:flex;justify-content:flex-end;margin-bottom:28px}
+  button{cursor:pointer;border:0;padding:8px 16px;font-weight:700;text-transform:uppercase;letter-spacing:1px;background:#fa1e4e;color:#fff;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);transition:.15s}
+  button:hover{background:#ff4d73;box-shadow:0 0 14px #fa1e4e}
+  button.danger{background:#5a0f1e}
+  button.ghost{background:#2a2a36}
+  .bar{align-items:center;gap:12px}
+  #authBtn{width:52px;height:52px;padding:6px;border-radius:50%;clip-path:none;background:#16161f;border:2px solid #fa1e4e;box-shadow:0 0 12px #fa1e4e88}
+  #authBtn.on{background:#fa1e4e}
+  #authBtn svg{width:100%;height:100%;display:block}
+  table{width:100%;border-collapse:separate;border-spacing:0;border-radius:20px;overflow:hidden;background:linear-gradient(160deg,#ffffff26 0,#ffffff0d 35%,#fa1e4e1a 100%);backdrop-filter:blur(14px);border:1px solid #ffffff30;box-shadow:inset 0 1px 0 #ffffff55,inset 0 -20px 40px #00000040,0 30px 60px -10px #000,0 20px 50px #fa1e4e44;position:relative}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  th,td{padding:11px 12px;text-align:left}
+  th{background:linear-gradient(180deg,#ffffff30,#ffffff08);color:#ff6b8b;text-transform:uppercase;letter-spacing:2px;font-size:.85rem}
+  td{background:transparent;border-top:1px solid #ffffff12}
+  tr:nth-child(even) td{background:#ffffff08}
+  tr:hover td{background:#fa1e4e22}
+  td.rank{font-weight:800;width:60px}
+  td.score{font-weight:800;color:#fa1e4e;font-family:Consolas,monospace;font-size:1.1rem}
+  .gold td.rank{color:#ffd700;text-shadow:0 0 8px #ffd700}.silver td.rank{color:#c8c8d0}.bronze td.rank{color:#cd7f32}
+  form{display:none;border-radius:16px;background:linear-gradient(160deg,#ffffff1f,#ffffff08);border:1px solid #ffffff30;box-shadow:inset 0 1px 0 #ffffff44,0 15px 30px #000a;padding:14px;margin-bottom:14px;gap:8px;flex-wrap:wrap}
+  form{display:flex;flex-direction:row;align-items:flex-end}
+  form h3{width:100%;margin:0;color:#ffd60a}
+  label{flex:1;min-width:150px;display:flex;flex-direction:column;gap:5px;font-size:.8rem;text-transform:uppercase;letter-spacing:1px;color:#ff6b8b}
+  .form-actions{display:flex;gap:8px}
+  .panel-title{margin:0 0 14px;font-size:1.6rem;color:#ffd60a;text-transform:uppercase;letter-spacing:3px;text-shadow:0 0 10px #ffb30088}
+  a.btn{cursor:pointer;padding:8px 16px;font-weight:700;text-transform:uppercase;letter-spacing:1px;background:#2a2a36;color:#fff;text-decoration:none;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
+  .bar{justify-content:space-between}
+  .bar>*:first-child{margin-right:auto}
+  input{padding:9px;border:1px solid #3a3a4a;border-left:3px solid #fa1e4e;background:#0b0b10;color:#fff;flex:1;min-width:120px;outline:0}
+  input:focus{border-color:#fa1e4e;box-shadow:0 0 8px #fa1e4e88}
+  #msg.ok{color:#7dffb0}
+  #msg{color:#ff6b8b;margin:6px 0;min-height:1em}
+  footer{text-align:center;padding:24px 12px 40px;color:#9a9aab;letter-spacing:1px}
+  footer b{color:#ffd60a;text-shadow:0 0 8px #ffb30088}
+  .empty{text-align:center;padding:30px;color:#777}
+</style>
+</head>
+<body>
+<header>
+  <svg class="happy" viewBox="0 0 64 80" aria-label="Happy meerkat">
+    <ellipse cx="32" cy="58" rx="13" ry="17" fill="#ffd60a"/>
+    <ellipse cx="32" cy="60" rx="7" ry="11" fill="#fff1a8"/>
+    <path d="M19 56 L9 44 M45 56 L55 44" stroke="#ffd60a" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="32" cy="30" r="12" fill="#ffe14d"/>
+    <ellipse cx="20" cy="29" rx="3.5" ry="5" fill="#b38600"/>
+    <ellipse cx="44" cy="29" rx="3.5" ry="5" fill="#b38600"/>
+    <ellipse cx="26" cy="29" rx="5" ry="5.5" fill="#2a1a0c"/>
+    <ellipse cx="38" cy="29" rx="5" ry="5.5" fill="#2a1a0c"/>
+    <circle cx="27.5" cy="27.5" r="2" fill="#fff"/>
+    <circle cx="39.5" cy="27.5" r="2" fill="#fff"/>
+    <ellipse cx="32" cy="36" rx="4" ry="3" fill="#fff1a8"/>
+    <circle cx="32" cy="35" r="1.8" fill="#111"/>
+    <path d="M26 39.5 q6 6 12 0" stroke="#111" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  </svg>
+  <h1><span>MEERKAT</span> <span class="plain" data-t="title"></span></h1>
+  <div id="clock"></div>
+</header>
+<main>
+  <div class="bar"><a class="btn ghost" href="/" id="backBtn" data-t="back"></a><button id="langBtn" class="ghost" title="Language / Јазик">EN | МК</button><button id="authBtn" class="on" title="Logout" aria-label="Logout"><svg viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="32" cy="44" rx="13" ry="17" fill="#ffd60a"/><ellipse cx="32" cy="46" rx="7" ry="11" fill="#fff1a8"/><circle cx="32" cy="22" r="11" fill="#ffe14d"/><ellipse cx="21" cy="21" rx="3.5" ry="5" fill="#b38600"/><ellipse cx="43" cy="21" rx="3.5" ry="5" fill="#b38600"/><ellipse cx="26.5" cy="21" rx="4.5" ry="5" fill="#2a1a0c"/><ellipse cx="37.5" cy="21" rx="4.5" ry="5" fill="#2a1a0c"/><circle cx="27" cy="20" r="1.8" fill="#fff"/><circle cx="38" cy="20" r="1.8" fill="#fff"/><ellipse cx="32" cy="27" rx="4" ry="3" fill="#fff1a8"/><circle cx="32" cy="26" r="1.8" fill="#111"/></svg></button></div>
+  <h2 class="panel-title" data-t="panel"></h2>
+  <div id="msg"></div>
+  <form id="form">
+    <h3 id="formTitle"></h3>
+    <label><span data-t="name"></span><input id="firstName" maxlength="50" autocomplete="off"></label>
+    <label><span data-t="surname"></span><input id="surname" maxlength="50" autocomplete="off"></label>
+    <label><span><span data-t="nickname"></span> *</span><input id="nickname" maxlength="50" required autocomplete="off"></label>
+    <label><span><span data-t="score"></span> *</span><input id="score" type="number" step="any" required></label>
+    <div class="form-actions">
+      <button type="submit" id="saveBtn"></button>
+      <button type="button" class="ghost" id="cancelBtn" data-t="cancel"></button>
+    </div>
+  </form>
+  <table>
+    <thead><tr><th>#</th><th data-t="nickname"></th><th data-t="name"></th><th data-t="surname"></th><th data-t="score"></th><th data-t="actions"></th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+</main>
+<footer><span data-t="devBy"></span> <b data-t="devName"></b></footer>
+<script>
+const $ = (id) => document.getElementById(id);
+let players = [], token = sessionStorage.getItem('token'), editId = null;
+if (!token) location.replace('/login.html');
+
+const I18N = {
+  en: { locale: 'en-US', devBy: 'Developed by', devName: 'Dushko Sofronievski Meerkat', title: 'GAMING LIVE LEADERBOARD', back: 'Leaderboard', panel: 'Admin panel', addTitle: 'Add a new player', editTitle: 'Edit player', saved: 'Player added', updated: 'Player updated', deleted: 'Player deleted', nickname: 'Nickname', name: 'Name', surname: 'Surname', score: 'Score', actions: 'Actions',
+    add: 'Add player', update: 'Update player', cancel: 'Cancel', edit: 'Edit', del: 'Delete', empty: 'No players yet',
+    login: 'Admin login', logout: 'Admin logout', confirmDel: 'Delete this player?',
+    unauthorized: 'Unauthorized', invalid: 'Nickname and numeric score required', notFound: 'Not found', error: 'Error' },
+  mk: { locale: 'mk-MK', devBy: 'Развиено од', devName: 'Душко Софрониевски Меркат', title: 'ГЕЈМИНГ ЛИВ ЛИДЕРБОРД', back: 'Табела', panel: 'Админ панел', addTitle: 'Додади нов играч', editTitle: 'Измени играч', saved: 'Играчот е додаден', updated: 'Играчот е ажуриран', deleted: 'Играчот е избришан', nickname: 'Прекар', name: 'Име', surname: 'Презиме', score: 'Поени', actions: 'Акции',
+    add: 'Додади играч', update: 'Ажурирај играч', cancel: 'Откажи', edit: 'Измени', del: 'Избриши', empty: 'Сè уште нема играчи',
+    login: 'Најава за админ', logout: 'Одјава на админ', confirmDel: 'Да се избрише овој играч?',
+    unauthorized: 'Неовластен пристап', invalid: 'Потребни се прекар и бројчани поени', notFound: 'Не е пронајдено', error: 'Грешка' }
+};
+const SERVER_MSG = { 'Unauthorized': 'unauthorized', 'Nickname and numeric score required': 'invalid', 'Not found': 'notFound' };
+let lang = localStorage.getItem('lang') === 'mk' ? 'mk' : 'en';
+const t = (k) => I18N[lang][k];
+
+const MK_DAYS = ['недела', 'понеделник', 'вторник', 'среда', 'четврток', 'петок', 'сабота'];
+const MK_MONTHS = ['јануари', 'февруари', 'март', 'април', 'мај', 'јуни', 'јули', 'август', 'септември', 'октомври', 'ноември', 'декември'];
+
+function tick() {
+  const d = new Date();
+  if (lang === 'mk') {
+    const p = (n) => String(n).padStart(2, '0');
+    $('clock').textContent = `${MK_DAYS[d.getDay()]}, ${d.getDate()} ${MK_MONTHS[d.getMonth()]} ${d.getFullYear()}, ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+  } else {
+    $('clock').textContent = d.toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'medium' });
+  }
+}
+setInterval(tick, 1000);
+
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.title = 'MEERKAT ' + t('panel');
+  document.querySelectorAll('[data-t]').forEach((el) => { el.textContent = t(el.dataset.t); });
+    $('langBtn').textContent = lang === 'mk' ? 'МК | EN' : 'EN | МК';
+  $('saveBtn').textContent = editId ? t('update') : t('add');
+  $('formTitle').textContent = editId ? t('editTitle') : t('addTitle');
+  tick(); render();
+}
+$('langBtn').onclick = () => { lang = lang === 'en' ? 'mk' : 'en'; localStorage.setItem('lang', lang); applyLang(); };
+
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function render() {
+  $('authBtn').title = t('logout');
+  const sorted = [...players].sort((a, b) => b.score - a.score);
+  $('rows').innerHTML = sorted.length ? sorted.map((p, i) => `
+    <tr class="${['gold', 'silver', 'bronze'][i] || ''}">
+      <td class="rank">${i + 1}</td><td>${esc(p.nickname)}</td><td>${esc(p.firstName)}</td><td>${esc(p.surname)}</td>
+      <td class="score">${esc(p.score)}</td>
+      <td><button data-edit="${p.id}">${t('edit')}</button> <button class="danger" data-del="${p.id}">${t('del')}</button></td>
+    </tr>`).join('') : `<tr><td colspan="6" class="empty">${t('empty')}</td></tr>`;
+}
+
+async function api(method, url, data) {
+  const res = await fetch(url, {
+    method,
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+    body: data ? JSON.stringify(data) : undefined
+  });
+  const json = await res.json();
+  if (res.status === 401 && token) { sessionStorage.removeItem('token'); location.replace('/login.html'); }
+  if (!res.ok) throw new Error(SERVER_MSG[json.error] ? t(SERVER_MSG[json.error]) : json.error || t('error'));
+  return json;
+}
+
+async function load() {
+  try { players = await api('GET', '/api/players'); render(); } catch (e) { $('msg').textContent = e.message; }
+}
+
+function resetForm() {
+  editId = null; $('form').reset(); applyLang();
+}
+
+const flash = (text, ok) => { $('msg').textContent = text; $('msg').className = ok ? 'ok' : ''; };
+
+$('form').onsubmit = async (e) => {
+  e.preventDefault(); flash('');
+  const data = { firstName: $('firstName').value, surname: $('surname').value, nickname: $('nickname').value, score: $('score').value };
+  const wasEdit = !!editId;
+  try {
+    await (editId ? api('PUT', '/api/players/' + editId, data) : api('POST', '/api/players', data));
+    resetForm(); await load(); flash(t(wasEdit ? 'updated' : 'saved'), true);
+  } catch (err) { flash(err.message); }
+};
+$('cancelBtn').onclick = () => { resetForm(); flash(''); };
+
+$('rows').onclick = async (e) => {
+  const { edit, del } = e.target.dataset;
+  if (edit) {
+    const p = players.find((x) => x.id === edit);
+    editId = edit; flash('');
+    $('firstName').value = p.firstName; $('surname').value = p.surname;
+    $('nickname').value = p.nickname; $('score').value = p.score;
+    applyLang();
+    $('form').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    $('nickname').focus();
+  }
+  if (del && confirm(t('confirmDel'))) {
+    try { await api('DELETE', '/api/players/' + del); await load(); flash(t('deleted'), true); } catch (err) { flash(err.message); }
+  }
+};
+
+$('authBtn').onclick = () => { sessionStorage.removeItem('token'); location.assign('/'); };
+applyLang(); load();
+</script>
+</body>
+</html>

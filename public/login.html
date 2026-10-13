@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin Login</title>
+<link rel="stylesheet" href="/auth.css">
+</head>
+<body>
+<button class="ghost lang" id="langBtn">EN | МК</button>
+<h1><span>MEERKAT</span> <span style="color:#fff;text-shadow:0 0 10px #fa1e4e,0 0 24px #fa1e4e" data-t="heading"></span></h1>
+<form class="card" id="form">
+  <input id="username" data-ph="username" autocomplete="username" required>
+  <input id="password" type="password" data-ph="password" autocomplete="current-password" required>
+  <button type="submit" data-t="login"></button>
+  <a class="btn ghost" href="/" data-t="back"></a>
+</form>
+<footer><span data-t="devBy"></span> <b data-t="devName"></b></footer>
+
+<div class="modal-bg" id="modalBg" role="alertdialog" aria-modal="true">
+  <div class="modal">
+    <h2 id="modalTitle"></h2>
+    <p id="modalText"></p>
+    <button id="modalOk" data-t="ok"></button>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const I18N = {
+  en: { heading: 'ADMIN LOGIN', username: 'Username', password: 'Password', login: 'Login', back: 'Back to leaderboard', ok: 'OK',
+    devBy: 'Developed by', devName: 'Dushko Sofronievski Meerkat',
+    failTitle: 'Unsuccessful login', failText: 'The username or password is incorrect. Please try again.',
+    netTitle: 'Server error', netText: 'Could not reach the server. Please try again later.' },
+  mk: { heading: 'АДМИН НАЈАВА', username: 'Корисничко име', password: 'Лозинка', login: 'Најави се', back: 'Назад кон табелата', ok: 'Во ред',
+    devBy: 'Развиено од', devName: 'Душко Софрониевски Меркат',
+    failTitle: 'Неуспешна најава', failText: 'Корисничкото име или лозинката се неточни. Обидете се повторно.',
+    netTitle: 'Грешка на серверот', netText: 'Серверот не може да се достигне. Обидете се подоцна.' }
+};
+let lang = localStorage.getItem('lang') === 'mk' ? 'mk' : 'en';
+const t = (k) => I18N[lang][k];
+
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.title = t('heading');
+  document.querySelectorAll('[data-t]').forEach((el) => { el.textContent = t(el.dataset.t); });
+  document.querySelectorAll('[data-ph]').forEach((el) => { el.placeholder = t(el.dataset.ph); });
+  $('langBtn').textContent = lang === 'mk' ? 'МК | EN' : 'EN | МК';
+}
+$('langBtn').onclick = () => { lang = lang === 'en' ? 'mk' : 'en'; localStorage.setItem('lang', lang); applyLang(); };
+
+function showModal(title, text) {
+  $('modalTitle').textContent = title; $('modalText').textContent = text;
+  $('modalBg').classList.add('show'); $('modalOk').focus();
+}
+$('modalOk').onclick = () => { $('modalBg').classList.remove('show'); $('password').select(); };
+
+$('form').onsubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const res = await fetch('/api/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: $('username').value, password: $('password').value })
+    });
+    if (res.ok) {
+      sessionStorage.setItem('token', (await res.json()).token);
+      return location.replace('/admin.html');
+    }
+    showModal(t('failTitle'), res.status === 401 ? t('failText') : t('netText'));
+  } catch {
+    showModal(t('netTitle'), t('netText'));
+  }
+};
+
+if (sessionStorage.getItem('token')) location.replace('/admin.html');
+applyLang();
+</script>
+</body>
+</html>

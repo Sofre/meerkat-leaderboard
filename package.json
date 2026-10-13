@@ -1,0 +1,15 @@
+﻿{
+    "version":  "1.0.0",
+    "name":  "meerkat-leaderboard",
+    "scripts":  {
+                    "start":  "node server.js",
+                    "dev":  "node server.js"
+                },
+    "dependencies":  {
+                         "@libsql/client":  "^0.18.0"
+                     },
+    "engines":  {
+                    "node":  "\u003e=20"
+                },
+    "private":  true
+}
