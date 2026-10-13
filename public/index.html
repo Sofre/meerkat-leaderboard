@@ -33,6 +33,23 @@
   td.rank{font-weight:800;width:60px}
   td.score{font-weight:800;color:#fa1e4e;font-family:Consolas,monospace;font-size:1.1rem}
   .gold td.rank{color:#ffd700;text-shadow:0 0 8px #ffd700}.silver td.rank{color:#c8c8d0}.bronze td.rank{color:#cd7f32}
+  .guidelines{margin-top:38px;padding:clamp(20px,4vw,34px);border:1px solid #ffffff24;border-radius:22px;background:linear-gradient(135deg,#20141b 0%,#15151e 55%,#17130d 100%);box-shadow:0 18px 48px #0008,inset 0 1px 0 #ffffff18;position:relative;overflow:hidden}
+  .guidelines::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:linear-gradient(#fa1e4e,#ffd60a)}
+  .guidelines-heading{text-align:center;margin-bottom:24px}
+  .guidelines-kicker{display:inline-block;margin-bottom:8px;color:#ffd60a;font-size:.75rem;font-weight:800;letter-spacing:3px;text-transform:uppercase}
+  .guidelines h2{margin:0;color:#fff;font-size:clamp(1.5rem,4vw,2rem);letter-spacing:2px;text-transform:uppercase;text-shadow:0 0 16px #fa1e4e66}
+  .guidelines-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+  .guideline-card{padding:20px;border:1px solid #ffffff18;border-radius:16px;background:#0b0b10a8}
+  .guideline-card h3{display:flex;align-items:center;gap:10px;margin:0 0 16px;color:#ff6b8b;font-size:1rem;letter-spacing:1.5px;text-transform:uppercase}
+  .guideline-card.rewards h3{color:#ffd60a}
+  .guideline-icon{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:#fa1e4e20;font-size:1.15rem}
+  .rewards .guideline-icon{background:#ffd60a20}
+  .guideline-list{display:grid;gap:12px;margin:0;padding:0;list-style:none}
+  .guideline-list li{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;color:#d4d4de;font-size:.95rem;line-height:1.55}
+  .guideline-number{color:#ff6b8b;font-family:Consolas,monospace;font-weight:800}
+  .rewards .guideline-number{color:#ffd60a}
+  .guideline-note{margin:18px 0 0;padding:12px 14px;border-left:3px solid #ffd60a;border-radius:0 10px 10px 0;background:#ffd60a0d;color:#f4e9bd;font-size:.9rem;line-height:1.55}
+  @media(max-width:640px){.guidelines-grid{grid-template-columns:1fr}.guideline-card{padding:17px}}
   input{padding:9px;border:1px solid #3a3a4a;border-left:3px solid #fa1e4e;background:#0b0b10;color:#fff;flex:1;min-width:120px;outline:0}
   input:focus{border-color:#fa1e4e;box-shadow:0 0 8px #fa1e4e88}
   footer{text-align:center;padding:24px 12px 40px;color:#9a9aab;letter-spacing:1px}
@@ -66,6 +83,32 @@
     <thead><tr><th>#</th><th data-t="nickname"></th><th data-t="name"></th><th data-t="surname"></th><th data-t="score"></th></tr></thead>
     <tbody id="rows"></tbody>
   </table>
+  <section class="guidelines" aria-labelledby="guidelinesTitle">
+    <div class="guidelines-heading">
+      <span class="guidelines-kicker" data-t="guidelinesKicker"></span>
+      <h2 id="guidelinesTitle" data-t="guidelinesTitle"></h2>
+    </div>
+    <div class="guidelines-grid">
+      <article class="guideline-card">
+        <h3><span class="guideline-icon" aria-hidden="true">⚡</span><span data-t="rulesTitle"></span></h3>
+        <ol class="guideline-list">
+          <li><span class="guideline-number">01</span><span data-t="ruleActive"></span></li>
+          <li><span class="guideline-number">02</span><span data-t="ruleHelping"></span></li>
+          <li><span class="guideline-number">03</span><span data-t="ruleProfessor"></span></li>
+          <li><span class="guideline-number">04</span><span data-t="ruleDeductions"></span></li>
+        </ol>
+      </article>
+      <article class="guideline-card rewards">
+        <h3><span class="guideline-icon" aria-hidden="true">🏆</span><span data-t="rewardsTitle"></span></h3>
+        <ol class="guideline-list">
+          <li><span class="guideline-number">01</span><span data-t="rewardFirst"></span></li>
+          <li><span class="guideline-number">02</span><span data-t="rewardPassDown"></span></li>
+          <li><span class="guideline-number">03</span><span data-t="rewardMultiplayer"></span></li>
+        </ol>
+        <p class="guideline-note" data-t="rewardWildcard"></p>
+      </article>
+    </div>
+  </section>
 </main>
 <footer><span data-t="devBy"></span> <b data-t="devName"></b></footer>
 <script>
@@ -74,11 +117,13 @@ let players = [];
 const token = sessionStorage.getItem('token');
 
 const I18N = {
-  en: { locale: 'en-US', devBy: 'Developed by', devName: 'Dushko Sofronievski Meerkat', title: 'GAMING LIVE LEADERBOARD', nickname: 'Nickname', name: 'Name', surname: 'Surname', score: 'Score', actions: 'Actions',
+  en: { locale: 'en-US', devBy: 'Developed by', devName: 'Sofre | Meerkat', title: 'GAMING LIVE LEADERBOARD', nickname: 'Nickname', name: 'Name', surname: 'Surname', score: 'Score', actions: 'Actions',
+    guidelinesKicker: 'Play fair · Earn points · Have fun', guidelinesTitle: 'Class Rules & Rewards', rulesTitle: 'How to earn points', ruleActive: 'Be active and take part in class to earn points.', ruleHelping: 'Help your friends out to earn points too.', ruleProfessor: 'Your professor decides how many points are awarded.', ruleDeductions: 'Points may be deducted for naughty behaviour or not following instructions. Your score can go below zero.', rewardsTitle: 'The PS5 is up for grabs', rewardFirst: 'First place gets to play on the PS5 after class.', rewardPassDown: 'If they pass, the chance goes to second place, then third place at most.', rewardMultiplayer: 'For a 2- or 3-player game, first place may automatically invite second and third place to join, or choose a wildcard player.', rewardWildcard: 'Wildcard rule: choosing a student below third place deducts points from first place. Wildcards are only for places below third; second and third place are not affected by this rule.',
     add: 'Add player', update: 'Update player', cancel: 'Cancel', edit: 'Edit', del: 'Delete', empty: 'No players yet',
     login: 'Admin login', logout: 'Admin logout', confirmDel: 'Delete this player?',
     unauthorized: 'Unauthorized', invalid: 'Nickname and numeric score required', notFound: 'Not found', error: 'Error' },
   mk: { locale: 'mk-MK', devBy: 'Развиено од', devName: 'Душко Софрониевски Меркат', title: 'ГЕЈМИНГ ЛИВ ЛИДЕРБОРД', nickname: 'Прекар', name: 'Име', surname: 'Презиме', score: 'Поени', actions: 'Акции',
+    guidelinesKicker: 'Играј фер · Освојувај поени · Забавувај се', guidelinesTitle: 'Правила и награди', rulesTitle: 'Како се освојуваат поени', ruleActive: 'Биди активен и учествувај на час за да освојуваш поени.', ruleHelping: 'Помагај им на другарите за да освоиш поени.', ruleProfessor: 'Професорот одлучува колку поени се доделуваат.', ruleDeductions: 'Поени може да се одземат за непристојно однесување или непочитување на упатствата. Поените може да паднат и под нула.', rewardsTitle: 'Освои играње на PS5', rewardFirst: 'Играчот на прво место добива можност да игра на PS5 по часот.', rewardPassDown: 'Ако одбие, можноста преминува на второто, а најмногу до третото место.', rewardMultiplayer: 'За игра со 2 или 3 играчи, првопласираниот може автоматски да ги покани второто и третото место или да избере џокер-играч.', rewardWildcard: 'Правило за џокер: изборот на ученик под третото место одзема поени од првопласираниот. Џокер важи само за места под третото; второто и третото место не се засегнати.',
     add: 'Додади играч', update: 'Ажурирај играч', cancel: 'Откажи', edit: 'Измени', del: 'Избриши', empty: 'Сè уште нема играчи',
     login: 'Најава за админ', logout: 'Одјава на админ', confirmDel: 'Да се избрише овој играч?',
     unauthorized: 'Неовластен пристап', invalid: 'Потребни се прекар и бројчани поени', notFound: 'Не е пронајдено', error: 'Грешка' }
